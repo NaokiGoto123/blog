@@ -1,11 +1,51 @@
 class BlogPostsController < ApplicationController
+    before_action :set_blog_post, except: [:index, :new, :create] #only: [:show, :edit, :update, :delete]
+
     def index
-        @blog_posts = BlogPosts.all
+        @blog_posts = BlogPost.all
     end
 
     def show
-        @blog_post = BlogPosts.find(params[:id])
         rescue ActiveRecord::RecordNotFound
             redirect_to root_path
+    end
+
+    def new
+        @blog_post = BlogPost.new
+    end
+
+    def create
+        @blog_post = BlogPost.new(blog_post_params)
+        if @blog_post.save
+            redirect_to @blog_post
+        else
+            render :new, status: :unprocessable_entity
+        end
+    end
+
+    def edit
+    end
+
+    def update
+        if @blog_post.updated(blog_post_params)
+            redirect_to @blog_post
+        else
+            render :edit, status: :unprocessable_entity
+        end
+    end
+
+    def delete
+        @blog_post.destroy
+        redirect_to root_path
+    end
+
+    private
+
+    def blog_post_params
+        params.require(:blog_post).permit(:title, :body)
+    end
+
+    def set_blog_post
+        @blog_post = BlogPost.find(params[:id])
     end
 end
